@@ -13,9 +13,15 @@ public class BallControl : MonoBehaviour {
     Gravity gravityGroup;
     public GameObject selectedBall;
     public GameObject grabbedBall;
+    Vector3 grabbedBallVelocity;
+
     //constants
-    const float grabStrength = 2;
+    public float grabStrength = 20;
     #endregion
+
+    //temp
+    public Vector3 relativePull = Vector3.zero;
+
 
     // Use this for initialization
     void Start () {
@@ -66,6 +72,14 @@ public class BallControl : MonoBehaviour {
     //what to do when trigger is released
     void HandleTriggerUp(byte controllerId, float value)
     {
+        //Rigidbody grabbedBody = grabbedBall.GetComponent<Rigidbody>();
+        //grabbedBall.GetComponent<Rigidbody>().AddForce(new Vector3(
+        //    grabbedBallVelocity.x * grabbedBody.mass,
+        //    grabbedBallVelocity.y * grabbedBody.mass,
+        //    grabbedBallVelocity.z * grabbedBody.mass));
+        //grabbedBall.GetComponent<Rigidbody>().velocity = grabbedBallVelocity;
+
+        //shut it down
         grabbedBall = null;
         StopAllCoroutines();
     }
@@ -75,7 +89,7 @@ public class BallControl : MonoBehaviour {
     {
         GameObject newBall = Instantiate(ballPrefab,gravityGroup.transform);
         newBall.transform.position = transform.position;
-        newBall.GetComponent<Rigidbody>().mass = .01f;
+        newBall.GetComponent<Rigidbody>().mass = .0001f;
         grabbedBall = newBall;
         StartCoroutine("InflateBall");
         StartCoroutine("MoveBall");
@@ -91,11 +105,14 @@ public class BallControl : MonoBehaviour {
             var direction = heading / distance; // This is now the normalized direction.
 
             //calculate pull to other ball (in normalized direction) based on mass and distance)
-            Vector3 relativePull = Vector3.zero;
-            relativePull.x = Mathf.Clamp(direction.x * grabbedBall.GetComponent<Rigidbody>().mass * grabStrength * gravityGroup.gravitationalConstant * distance * distance, -gravityGroup.forceclamp, gravityGroup.forceclamp);
-            relativePull.y = Mathf.Clamp(direction.y * grabbedBall.GetComponent<Rigidbody>().mass * grabStrength * gravityGroup.gravitationalConstant * distance * distance, -gravityGroup.forceclamp, gravityGroup.forceclamp);
-            relativePull.z = Mathf.Clamp(direction.z * grabbedBall.GetComponent<Rigidbody>().mass * grabStrength * gravityGroup.gravitationalConstant * distance * distance, -gravityGroup.forceclamp, gravityGroup.forceclamp);
+            
+            relativePull.x = Mathf.Clamp(direction.x * grabStrength * gravityGroup.gravitationalConstant * distance * distance, -gravityGroup.forceclamp, gravityGroup.forceclamp);
+            relativePull.y = Mathf.Clamp(direction.y * grabStrength * gravityGroup.gravitationalConstant * distance * distance, -gravityGroup.forceclamp, gravityGroup.forceclamp);
+            relativePull.z = Mathf.Clamp(direction.z * grabStrength * gravityGroup.gravitationalConstant * distance * distance, -gravityGroup.forceclamp, gravityGroup.forceclamp);
             grabbedBall.GetComponent<Rigidbody>().AddForce(relativePull);
+
+            //grabbedBall.GetComponent<Rigidbody>().MovePosition(transform.position);
+            //grabbedBallVelocity = grabbedBall.GetComponent<Rigidbody>().velocity;
 
             yield return null; 
         }
@@ -105,7 +122,7 @@ public class BallControl : MonoBehaviour {
     {
         while (true)
         {
-            grabbedBall.GetComponent<Rigidbody>().mass += .01f;
+            grabbedBall.GetComponent<Rigidbody>().mass += .0001f;
             yield return null;
         }
     }

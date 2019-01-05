@@ -31,6 +31,14 @@ public class Gravity : MonoBehaviour {
         //cycle through each ball
         for (int i = 0; i < gravityBallz.Length; i++)
         {
+
+            //cull balls before calculating
+            if (Vector3.Distance(gravityBallz[i].transform.position, Camera.main.transform.position) > 100)
+            {
+                GameObject.Destroy(gravityBallz[i].gameObject);
+                
+            }
+
             //adjust ball size according to rigid body mass
             gravityBallz[i].transform.localScale = new Vector3(
                 Mathf.Pow(gravityBallz[i].mass, 1f / 3f), Mathf.Pow(gravityBallz[i].mass, 1f / 3f), Mathf.Pow(gravityBallz[i].mass, 1f / 3f));
@@ -48,6 +56,7 @@ public class Gravity : MonoBehaviour {
         //cycle through each other ball to calculate pull
         for (int j = 0; j < gravityBallz.Length; j++)
         {
+
             // Gets a vector that points from the this ball to the other.
             var heading = gravityBall.transform.position - gravityBallz[j].transform.position;
             var distance = heading.magnitude;
