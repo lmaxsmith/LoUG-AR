@@ -50,19 +50,19 @@ namespace MagicLeap
         [SerializeField, Tooltip("The color assigned to the wrist keypoints.")]
         private Color _wristColor = Color.white;
 
-        private List<Transform> _pinkyFinger;
-        private List<Transform> _ringFinger;
-        private List<Transform> _middleFinger;
-        private List<Transform> _indexFinger;
-        private List<Transform> _thumb;
-        private List<Transform> _wrist;
+        protected List<Transform> _pinkyFinger;
+        protected List<Transform> _ringFinger;
+        protected List<Transform> _middleFinger;
+        protected List<Transform> _indexFinger;
+        protected List<Transform> _thumb;
+        protected List<Transform> _wrist;
         #endregion
 
         #region Private Properties
         /// <summary>
         /// Returns the hand based on the hand type.
         /// </summary>
-        private MLHand Hand
+        protected MLHand Hand
         {
             get
             {
@@ -82,7 +82,7 @@ namespace MagicLeap
         /// <summary>
         /// Initializes MLHands API.
         /// </summary>
-        void Start()
+        protected void Start()
         {
             MLResult result = MLHands.Start();
             if (!result.IsOk)
@@ -109,7 +109,7 @@ namespace MagicLeap
         /// <summary>
         /// Update the keypoint positions.
         /// </summary>
-        void Update()
+        protected void Update()
         {
             if (MLHands.IsStarted)
             {

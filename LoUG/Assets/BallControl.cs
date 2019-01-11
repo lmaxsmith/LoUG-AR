@@ -5,7 +5,7 @@ using UnityEngine.XR.MagicLeap;
 
 public class BallControl : MonoBehaviour {
 
-    #region Variabls
+    #region Variables
     //public 
     public GameObject ballPrefab;
 
@@ -14,6 +14,9 @@ public class BallControl : MonoBehaviour {
     public GameObject selectedBall;
     public GameObject grabbedBall;
     Vector3 grabbedBallVelocity;
+    Rigidbody thisRB;
+    FixedJoint thisJoint;
+
 
     //constants
     public float grabStrength = 20;
@@ -26,16 +29,20 @@ public class BallControl : MonoBehaviour {
     // Use this for initialization
     void Start () {
         gravityGroup = FindObjectOfType<Gravity>();
+        thisRB = GetComponent<Rigidbody>();
+        thisJoint = GetComponent<FixedJoint>();
+
 
         //subscribe methods for controller
-        MLInput.OnTriggerDown += HandleTriggerDown;
-        MLInput.OnTriggerUp += HandleTriggerUp;
+        MLInput.OnTriggerDown += StartClick;
+        MLInput.OnTriggerUp += StopClick;
+        
     }
     //unsubscribe from events
     private void OnDestroy()
     {
-        MLInput.OnTriggerDown -= HandleTriggerDown;
-        MLInput.OnTriggerUp -= HandleTriggerUp;
+        MLInput.OnTriggerDown -= StartClick;
+        MLInput.OnTriggerUp -= StopClick;
     }
 
     // Update is called once per frame
@@ -56,32 +63,37 @@ public class BallControl : MonoBehaviour {
     }
 
     //what to do when trigger is pressed
-    void HandleTriggerDown(byte controllerId, float value)
+    public void StartClick(byte controllerId, float value)
+    {
+        StartClick();
+    }
+    public void StartClick()
     {
         if (selectedBall)
         {
             grabbedBall = selectedBall;
-            StartCoroutine("MoveBall");
+            //StartCoroutine("MoveBall");
+            thisJoint.connectedBody = grabbedBall.GetComponent<Rigidbody>();
         }
         else
         {
             NewBall();
         }
+
     }
 
     //what to do when trigger is released
-    void HandleTriggerUp(byte controllerId, float value)
+    public void StopClick(byte controllerId, float value)
     {
-        //Rigidbody grabbedBody = grabbedBall.GetComponent<Rigidbody>();
-        //grabbedBall.GetComponent<Rigidbody>().AddForce(new Vector3(
-        //    grabbedBallVelocity.x * grabbedBody.mass,
-        //    grabbedBallVelocity.y * grabbedBody.mass,
-        //    grabbedBallVelocity.z * grabbedBody.mass));
-        //grabbedBall.GetComponent<Rigidbody>().velocity = grabbedBallVelocity;
-
+        StopClick();
+    }
+    public void StopClick()
+    {
         //shut it down
         grabbedBall = null;
+        thisJoint = null;
         StopAllCoroutines();
+
     }
 
 
@@ -91,14 +103,19 @@ public class BallControl : MonoBehaviour {
         newBall.transform.position = transform.position;
         newBall.GetComponent<Rigidbody>().mass = .0001f;
         grabbedBall = newBall;
+        thisJoint.connectedBody = grabbedBall.GetComponent<Rigidbody>();
+
         StartCoroutine("InflateBall");
-        StartCoroutine("MoveBall");
+        //StartCoroutine("MoveBall");
     }
 
     IEnumerator MoveBall()
     {
         while (true)
         {
+
+            //grabbedBall.GetComponent<Rigidbody>().velocity = GetComponent<Rigidbody>().velocity;
+
             // Gets a vector that points from the this ball to the other.
             var heading = transform.position - grabbedBall.transform.position;
             var distance = heading.magnitude;

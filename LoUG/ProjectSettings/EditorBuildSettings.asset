@@ -8,7 +8,13 @@ EditorBuildSettings:
   - enabled: 0
     path: 
     guid: 00000000000000000000000000000000
-  - enabled: 1
+  - enabled: 0
+    path: 
+    guid: 00000000000000000000000000000000
+  - enabled: 0
     path: Assets/Scenes/ML Balls.unity
-    guid: c316cfb942708134ebe21b8e78b50720
+    guid: c4a6876705b3bae4ab9edc5de5614cbf
+  - enabled: 1
+    path: Assets/Scenes/HandTracking Ballz.unity
+    guid: 3c8023d0dc4c5c94291e5626bc97066d
   m_configObjects: {}
